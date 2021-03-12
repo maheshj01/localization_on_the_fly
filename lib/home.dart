@@ -149,7 +149,7 @@ class _MyHomePageState extends State<MyHomePage>
         margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(6),
-            color: Colors.white,
+            color: isDarkNotifier.value ? Colors.grey[850] : Colors.white70,
             boxShadow: [
               BoxShadow(
                 color: Colors.blue[100].withOpacity(0.3),
@@ -160,7 +160,10 @@ class _MyHomePageState extends State<MyHomePage>
             ]),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [Text(key), Text(value)],
+          children: [
+            Text(key),
+            Text(value, style: TextStyle(fontSize: 18)),
+          ],
         ));
   }
 
@@ -183,6 +186,7 @@ class _MyHomePageState extends State<MyHomePage>
   Settings _settings;
   String selectedLanguage = 'es';
   ValueNotifier<bool> isDarkNotifier;
+  final List<String> languages = [];
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -297,9 +301,15 @@ class _ConnectionsState extends State<Connections> {
       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       width: 150,
       decoration: BoxDecoration(
-        color: Colors.brown.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(4),
-      ),
+          color: theme == AppTheme.dark ? Colors.grey[850] : Colors.white70,
+          borderRadius: BorderRadius.circular(4),
+          boxShadow: [
+            BoxShadow(
+                blurRadius: 4,
+                spreadRadius: 4,
+                color: Colors.blue[100].withOpacity(0.3),
+                offset: Offset(3, 2))
+          ]),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -338,8 +348,10 @@ class _ConnectionsState extends State<Connections> {
     super.dispose();
   }
 
+  AppTheme theme;
   @override
   Widget build(BuildContext context) {
+    theme = Provider.of<Settings>(context, listen: false).theme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -358,10 +370,11 @@ class _ConnectionsState extends State<Connections> {
               } else
                 return Container(
                     height: 200,
-                    margin: EdgeInsets.symmetric(vertical: 8),
+                    margin: EdgeInsets.symmetric(vertical: 6),
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: snapshot.data.length,
+                      padding: EdgeInsets.symmetric(vertical: 6),
                       itemBuilder: (_, x) => _userCard(snapshot.data[x], x),
                     ));
             }),
