@@ -6,7 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class LocaleModel with ChangeNotifier {
   LocaleModel() {
-    getLanguagePreferences();
     fetchTranslations();
   }
 
@@ -20,28 +19,31 @@ class LocaleModel with ChangeNotifier {
     locale = l;
     _selectedTranslation = {};
     _selectedTranslation = _translations['${l.languageCode}'];
+    setLanguagePreferences(l.languageCode);
     notifyListeners();
   }
 
-  Future<void> getLanguagePreferences() async {
+  Future<String> getLanguagePreferences() async {
     final prefs = await SharedPreferences.getInstance();
     String language = prefs.getString('locale');
     locale = Locale(language ?? 'en');
+    return locale.languageCode;
   }
 
   Future<void> setLanguagePreferences(String l) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString('${locale}', l);
+    prefs.setString('locale', l);
   }
 
-  Future<void> fetchTranslations({String language = 'en'}) async {
+  Future<void> fetchTranslations({String language}) async {
     try {
+      language = await getLanguagePreferences();
       final response = await http.get(Uri.parse(translationsApi));
       if (response != null) {
         if (response.statusCode == 200) {
           final Map decoded = json.decode(response.body);
+          _selectedTranslation = decoded[language ?? 'en'];
           _translations = decoded;
-          _selectedTranslation = decoded[language];
         }
       }
     } catch (_) {
