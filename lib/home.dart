@@ -40,6 +40,19 @@ class _MyHomePageState extends State<MyHomePage>
     }
   }
 
+  Future<void> getAvailableLanguages() async {
+    try {
+      final res = await http.get(Uri.parse(supportedLocalesApi));
+      if (res.statusCode == 200) {
+        final decodedResponse = json.decode(res.body);
+        Iterable list = decodedResponse['supported_languages'];
+        setState(() {
+          languages = list.map((e) => e.toString()).toList();
+        });
+      }
+    } catch (_) {}
+  }
+
   Widget _title() {
     return Padding(
       padding: const EdgeInsets.only(left: 16.0, top: 40, bottom: 25),
@@ -48,8 +61,7 @@ class _MyHomePageState extends State<MyHomePage>
         children: [
           Flexible(
             child: Text(
-              localize(
-                  _localeModel.translations['userIntro'], [user.name.first]),
+              localize(_localeModel.translations['intro'], [user.name.first]),
               style: TextStyle(fontSize: 40),
             ),
           ),
@@ -74,9 +86,11 @@ class _MyHomePageState extends State<MyHomePage>
     // TODO: implement initState
     super.initState();
     getUser();
+    getAvailableLanguages();
     iconController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 400));
     _settings = Provider.of<Settings>(context, listen: false);
+    _localeModel = Provider.of<LocaleModel>(context, listen: false);
     isDarkNotifier = ValueNotifier(_settings.theme == AppTheme.dark);
   }
 
@@ -85,7 +99,7 @@ class _MyHomePageState extends State<MyHomePage>
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8.0),
         child: Text(
-          localize(_localeModel.translations['aboutUser'],
+          localize(_localeModel.translations['description'],
               [user.location.city, user.location.state, user.location.country]),
           textAlign: TextAlign.center,
           style: TextStyle(),
@@ -184,94 +198,117 @@ class _MyHomePageState extends State<MyHomePage>
   AnimationController iconController;
   LocaleModel _localeModel;
   Settings _settings;
-  String selectedLanguage = 'es';
+  String selectedLanguage;
   ValueNotifier<bool> isDarkNotifier;
-  final List<String> languages = [];
+  List<String> languages = [];
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: ChangeNotifierProvider(
-          create: (_) => LocaleModel(),
-          child: Consumer<LocaleModel>(builder: (context, provider, child) {
-            _localeModel = provider;
-            return Scaffold(
-              body: isLoading || provider.translations.isEmpty || user == null
-                  ? Center(child: CircularProgressIndicator())
-                  : SingleChildScrollView(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          ValueListenableBuilder<bool>(
-                            valueListenable: isDarkNotifier,
-                            builder: (_, theme, child) {
-                              return Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+      child: Scaffold(
+          body: isLoading || _localeModel.translations.isEmpty || user == null
+              ? Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      ValueListenableBuilder<bool>(
+                        valueListenable: isDarkNotifier,
+                        builder: (_, theme, child) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                stackedLogo('Profile'),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    stackedLogo('Profile'),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        _dropDown(selectedLanguage,
-                                            ['en', 'de', 'es'], onChange: (x) {
-                                          setState(() {
-                                            selectedLanguage = x;
-                                          });
-                                        }),
-                                        CupertinoSwitch(
-                                          value: theme,
-                                          onChanged: (isDark) {
-                                            isDarkNotifier.value = isDark;
-                                            if (isDark) {
-                                              iconController.forward();
-                                              Provider.of<Settings>(context,
-                                                      listen: false)
-                                                  .theme = AppTheme.dark;
-                                            } else {
-                                              iconController.reverse();
-                                              Provider.of<Settings>(context,
-                                                      listen: false)
-                                                  .theme = AppTheme.light;
-                                            }
-                                          },
-                                        ),
-                                        SizedBox(
-                                          width: 5,
-                                        ),
-                                        Icon(isDarkNotifier.value
-                                            ? Icons.brightness_2_outlined
-                                            : Icons.wb_sunny_rounded),
-                                      ],
+                                    _dropDown(
+                                        selectedLanguage ??
+                                            _localeModel.locale.languageCode,
+                                        languages, onChange: (x) {
+                                      _localeModel.changelocale(Locale(x));
+                                      setState(() {
+                                        selectedLanguage = x;
+                                      });
+                                    }),
+                                    SizedBox(width: 8),
+                                    CupertinoSwitch(
+                                      value: theme,
+                                      onChanged: (isDark) {
+                                        isDarkNotifier.value = isDark;
+                                        if (isDark) {
+                                          iconController.forward();
+                                          Provider.of<Settings>(context,
+                                                  listen: false)
+                                              .theme = AppTheme.dark;
+                                        } else {
+                                          iconController.reverse();
+                                          Provider.of<Settings>(context,
+                                                  listen: false)
+                                              .theme = AppTheme.light;
+                                        }
+                                      },
                                     ),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Icon(isDarkNotifier.value
+                                        ? Icons.brightness_2_outlined
+                                        : Icons.wb_sunny_rounded),
                                   ],
                                 ),
-                              );
-                            },
-                          ),
-                          _title(),
-                          _description(),
-                          subtitle('About'),
-                          infoTile('Gender', user.gender),
-                          infoTile('Email', user.email),
-                          SizedBox(
-                            height: 8,
-                          ),
-                          subtitle('Location'),
-                          infoTile('City', user.location.city),
-                          infoTile('State', user.location.state),
-                          infoTile('Country', user.location.country),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: subtitle('People you may know'),
-                          ),
-                          Connections()
-                        ],
+                              ],
+                            ),
+                          );
+                        },
                       ),
-                    ),
-            );
-          })),
+                      _title(),
+                      _description(),
+                      subtitle(localize(
+                        _localeModel.translations['about'],
+                      )),
+                      infoTile(
+                          localize(
+                            _localeModel.translations['about.gender'],
+                          ),
+                          user.gender),
+                      infoTile(
+                          localize(
+                            _localeModel.translations['about.email'],
+                          ),
+                          user.email),
+                      SizedBox(
+                        height: 8,
+                      ),
+                      subtitle(localize(
+                        _localeModel.translations['location'],
+                      )),
+                      infoTile(
+                          localize(
+                            _localeModel.translations['location.city'],
+                          ),
+                          user.location.city),
+                      infoTile(
+                          localize(
+                            _localeModel.translations['location.state'],
+                          ),
+                          user.location.state),
+                      infoTile(
+                          localize(
+                            _localeModel.translations['location.country'],
+                          ),
+                          user.location.country),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: subtitle(localize(
+                          _localeModel.translations['peopleyoumayknow'],
+                        )),
+                      ),
+                      Connections()
+                    ],
+                  ),
+                )),
     );
   }
 }

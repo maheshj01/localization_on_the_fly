@@ -1,5 +1,6 @@
 const randomApi = 'https://randomuser.me/api?seed=6f5b58be752ab832';
-const translationsApi = 'https://api.npoint.io/2bd5dd89b99625950980';
+const translationsApi = 'https://api.npoint.io/12c3f697206920bc8eaa';
+const supportedLocalesApi = 'https://api.npoint.io/48d30b0ab3649e53aa95';
 const RANDOM_CONNECTIONS = 'https://randomuser.me/api/?results=50';
 const description =
     """Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia,
