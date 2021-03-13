@@ -15,6 +15,13 @@ class LocaleModel with ChangeNotifier {
   Locale locale;
   Locale get getlocale => locale;
 
+  Map<String, dynamic> get translations => _selectedTranslation;
+
+  set translations(Map<String, dynamic> map) {
+    _selectedTranslation = map;
+    notifyListeners();
+  }
+
   void changelocale(Locale l) {
     locale = l;
     _selectedTranslation = {};
@@ -44,17 +51,11 @@ class LocaleModel with ChangeNotifier {
           final Map decoded = json.decode(response.body);
           _selectedTranslation = decoded[language ?? 'en'];
           _translations = decoded;
+          notifyListeners();
         }
       }
     } catch (_) {
       print(_.toString());
     }
   }
-
-  set translations(Map<String, dynamic> map) {
-    _selectedTranslation = map;
-    notifyListeners();
-  }
-
-  Map<String, dynamic> get translations => _selectedTranslation;
 }
