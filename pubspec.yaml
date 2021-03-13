@@ -1,5 +1,6 @@
 name: localization
-description: A new Flutter project.
+description: A proof of concept showing flutter localization on the fly.
+repository: https://github.com/maheshmnj/localization_on_the_fly
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.

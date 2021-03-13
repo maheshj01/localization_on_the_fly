@@ -1,6 +1,7 @@
 # localization
 
-A new Flutter project.
+### Flutter Localization on the fly
+You can see the [demo app here](https://maheshmnj.github.io/localization)
 
 ## Getting Started
 
