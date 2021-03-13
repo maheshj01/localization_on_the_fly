@@ -105,3 +105,4 @@ macos/**/xcuserdata/
 ios/Flutter/Debug.xcconfig
 ios/Flutter/Release.xcconfig
 ios/Podfile.lock
+ios/Runner.xcodeproj/project.pbxproj
