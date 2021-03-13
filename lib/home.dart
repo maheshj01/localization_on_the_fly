@@ -139,7 +139,9 @@ class _MyHomePageState extends State<MyHomePage>
       padding: EdgeInsets.symmetric(horizontal: 15),
       height: 30,
       decoration: BoxDecoration(
-          border: Border.all(), borderRadius: BorderRadius.circular(5)),
+          border: Border.all(
+              color: isDarkNotifier.value ? Colors.white : Colors.black),
+          borderRadius: BorderRadius.circular(5)),
       child: DropdownButton<String>(
           underline: Container(),
           icon: Container(),
@@ -151,7 +153,7 @@ class _MyHomePageState extends State<MyHomePage>
                     value: e.toString(),
                   ))
               .toList(),
-          value: selectedLanguage,
+          value: selected,
           onChanged: (x) => onChange(x)),
     );
   }
@@ -219,7 +221,9 @@ class _MyHomePageState extends State<MyHomePage>
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                stackedLogo('Profile'),
+                                stackedLogo(localize(
+                                  _localeModel.translations['profile'],
+                                )),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
@@ -253,7 +257,7 @@ class _MyHomePageState extends State<MyHomePage>
                                     SizedBox(
                                       width: 5,
                                     ),
-                                    Icon(isDarkNotifier.value
+                                    Icon(!isDarkNotifier.value
                                         ? Icons.brightness_2_outlined
                                         : Icons.wb_sunny_rounded),
                                   ],

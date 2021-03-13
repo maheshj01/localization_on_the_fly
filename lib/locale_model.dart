@@ -32,7 +32,7 @@ class LocaleModel with ChangeNotifier {
 
   Future<void> setLanguagePreferences(String l) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString('locale', l);
+    prefs.setString('${locale}', l);
   }
 
   Future<void> fetchTranslations({String language = 'en'}) async {
