@@ -5,9 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:localization/const.dart';
+import 'package:localization/locale_model.dart';
 import 'package:localization/settings.dart';
 import 'package:localization/user_model.dart';
-import 'package:localization/locale_model.dart';
 import 'package:localization/utils.dart';
 import 'package:provider/provider.dart';
 
@@ -61,7 +61,7 @@ class _MyHomePageState extends State<MyHomePage>
         children: [
           Flexible(
             child: Text(
-              localize(_localeModel.translations['intro'], [user.name.first]),
+              localize(_localeModel.translations['intro'], [user!.name.first]),
               style: TextStyle(fontSize: 40),
             ),
           ),
@@ -71,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage>
               child: CircleAvatar(
                 radius: 80,
                 backgroundImage: NetworkImage(
-                  user.picture.large,
+                  user!.picture.large,
                 ),
               )),
         ],
@@ -80,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   bool isLoading = false;
-  UserModel user;
+  UserModel? user;
   @override
   void initState() {
     // TODO: implement initState
@@ -99,8 +99,11 @@ class _MyHomePageState extends State<MyHomePage>
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8.0),
         child: Text(
-          localize(_localeModel.translations['description'],
-              [user.location.city, user.location.state, user.location.country]),
+          localize(_localeModel.translations['description'], [
+            user!.location.city,
+            user!.location.state,
+            user!.location.country
+          ]),
           textAlign: TextAlign.center,
           style: TextStyle(),
         ),
@@ -125,16 +128,16 @@ class _MyHomePageState extends State<MyHomePage>
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context)
                       .textTheme
-                      .bodyText1
-                      .color
+                      .bodyLarge!
+                      .color!
                       .withOpacity(0.5)),
             )),
       ],
     );
   }
 
-  Widget _dropDown(String selected, List<String> list,
-      {Function(String) onChange}) {
+  Widget _dropDown(
+      String selected, List<String> list, Function(String) onChange) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 15),
       height: 30,
@@ -154,7 +157,7 @@ class _MyHomePageState extends State<MyHomePage>
                   ))
               .toList(),
           value: selected,
-          onChanged: (x) => onChange(x)),
+          onChanged: (x) => onChange(x!)),
     );
   }
 
@@ -168,7 +171,7 @@ class _MyHomePageState extends State<MyHomePage>
             color: isDarkNotifier.value ? Colors.grey[850] : Colors.white70,
             boxShadow: [
               BoxShadow(
-                color: Colors.blue[100].withOpacity(0.3),
+                color: Colors.blue[100]!.withOpacity(0.3),
                 spreadRadius: 4,
                 blurRadius: 3,
                 offset: Offset(1, 2), // changes position of shadow
@@ -197,17 +200,17 @@ class _MyHomePageState extends State<MyHomePage>
     );
   }
 
-  AnimationController iconController;
-  LocaleModel _localeModel;
-  Settings _settings;
-  String selectedLanguage;
-  ValueNotifier<bool> isDarkNotifier;
+  late AnimationController iconController;
+  late LocaleModel _localeModel;
+  late Settings _settings;
+  String? selectedLanguage;
+  late ValueNotifier<bool> isDarkNotifier;
   List<String> languages = [];
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-          body: isLoading || _localeModel.translations.isEmpty || user == null
+          body: isLoading || _localeModel.translations.isEmpty
               ? Center(child: CircularProgressIndicator())
               : SingleChildScrollView(
                   child: Column(
@@ -230,7 +233,7 @@ class _MyHomePageState extends State<MyHomePage>
                                     _dropDown(
                                         selectedLanguage ??
                                             _localeModel.locale.languageCode,
-                                        languages, onChange: (x) {
+                                        languages, (x) {
                                       _localeModel.changelocale(Locale(x));
                                       setState(() {
                                         selectedLanguage = x;
@@ -276,12 +279,12 @@ class _MyHomePageState extends State<MyHomePage>
                           localize(
                             _localeModel.translations['about.gender'],
                           ),
-                          user.gender),
+                          user!.gender),
                       infoTile(
                           localize(
                             _localeModel.translations['about.email'],
                           ),
-                          user.email),
+                          user!.email),
                       SizedBox(
                         height: 8,
                       ),
@@ -292,17 +295,17 @@ class _MyHomePageState extends State<MyHomePage>
                           localize(
                             _localeModel.translations['location.city'],
                           ),
-                          user.location.city),
+                          user!.location.city),
                       infoTile(
                           localize(
                             _localeModel.translations['location.state'],
                           ),
-                          user.location.state),
+                          user!.location.state),
                       infoTile(
                           localize(
                             _localeModel.translations['location.country'],
                           ),
-                          user.location.country),
+                          user!.location.country),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: subtitle(localize(
@@ -348,7 +351,7 @@ class _ConnectionsState extends State<Connections> {
             BoxShadow(
                 blurRadius: 4,
                 spreadRadius: 4,
-                color: Colors.blue[100].withOpacity(0.3),
+                color: Colors.blue[100]!.withOpacity(0.3),
                 offset: Offset(3, 2))
           ]),
       child: Column(
@@ -389,7 +392,7 @@ class _ConnectionsState extends State<Connections> {
     super.dispose();
   }
 
-  AppTheme theme;
+  AppTheme? theme;
   @override
   Widget build(BuildContext context) {
     theme = Provider.of<Settings>(context, listen: false).theme;
@@ -402,7 +405,7 @@ class _ConnectionsState extends State<Connections> {
                 AsyncSnapshot<List<UserModel>> snapshot) {
               if (snapshot.hasError) {
                 return Center(
-                  child: Text(snapshot.error),
+                  child: Text(snapshot.error.toString()),
                 );
               } else if (snapshot.data == null) {
                 return Center(
@@ -414,9 +417,9 @@ class _ConnectionsState extends State<Connections> {
                     margin: EdgeInsets.symmetric(vertical: 6),
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: snapshot.data.length,
+                      itemCount: snapshot.data!.length,
                       padding: EdgeInsets.symmetric(vertical: 6),
-                      itemBuilder: (_, x) => _userCard(snapshot.data[x], x),
+                      itemBuilder: (_, x) => _userCard(snapshot.data![x], x),
                     ));
             }),
       ],

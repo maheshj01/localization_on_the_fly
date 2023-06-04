@@ -2,8 +2,8 @@
 /// args list
 //TODO: ADD a valid regex pattern
 /// ``` \$\{l\.languageCode\} ```
-String localize(String string, [List<String> args]) {
-  if (args == null || args.isEmpty) return string;
+String localize(String string, [List<String>? args]) {
+  if (args == null) return string;
   List<String> list = string.split(' ').toList();
   int count = 0;
 

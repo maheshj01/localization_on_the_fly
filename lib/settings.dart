@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 enum AppTheme { light, dark }
 
 class Settings extends ChangeNotifier {
-  Settings([this._theme]);
+  Settings(this._theme);
+
   AppTheme _theme;
 
   AppTheme get theme => _theme;

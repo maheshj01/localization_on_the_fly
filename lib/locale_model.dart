@@ -1,6 +1,7 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:localization/const.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,7 +13,7 @@ class LocaleModel with ChangeNotifier {
   Map<String, dynamic> _translations = {};
   Map<String, dynamic> _selectedTranslation = {};
 
-  Locale locale;
+  Locale locale = Locale('en');
   Locale get getlocale => locale;
 
   Map<String, dynamic> get translations => _selectedTranslation;
@@ -32,7 +33,7 @@ class LocaleModel with ChangeNotifier {
 
   Future<String> getLanguagePreferences() async {
     final prefs = await SharedPreferences.getInstance();
-    String language = prefs.getString('locale');
+    String? language = prefs.getString('locale');
     locale = Locale(language ?? 'en');
     return locale.languageCode;
   }
@@ -42,17 +43,15 @@ class LocaleModel with ChangeNotifier {
     prefs.setString('locale', l);
   }
 
-  Future<void> fetchTranslations({String language}) async {
+  Future<void> fetchTranslations({String? language}) async {
     try {
       language = await getLanguagePreferences();
       final response = await http.get(Uri.parse(translationsApi));
-      if (response != null) {
-        if (response.statusCode == 200) {
-          final Map decoded = json.decode(response.body);
-          _selectedTranslation = decoded[language ?? 'en'];
-          _translations = decoded;
-          notifyListeners();
-        }
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> decoded = json.decode(response.body);
+        _selectedTranslation = decoded[language ?? 'en'];
+        _translations = decoded;
+        notifyListeners();
       }
     } catch (_) {
       print(_.toString());

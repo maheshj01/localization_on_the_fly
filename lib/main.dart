@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:localization/home.dart';
 import 'package:localization/locale_model.dart';
@@ -20,7 +19,7 @@ class MyApp extends StatelessWidget {
       ],
       child: Consumer2<Settings, LocaleModel>(
         builder: (BuildContext context, Settings provider, LocaleModel locale,
-            Widget child) {
+            Widget? child) {
           return MaterialApp(
             title: 'Localization',
             debugShowCheckedModeBanner: false,
